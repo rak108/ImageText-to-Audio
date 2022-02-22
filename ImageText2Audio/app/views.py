@@ -1,7 +1,5 @@
 from flask import render_template, request, redirect
-from flask_appbuilder import ModelView
-from flask_appbuilder.models.mongoengine.interface import MongoEngineInterface
-from app import appbuilder
+from app import app
 import os
 from werkzeug.utils import secure_filename
 
@@ -27,7 +25,7 @@ def allowed_image(filename):
 app.config["IMAGE_UPLOADS"] = "./uploads"
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
     return render_template("index.html")
 
@@ -62,7 +60,7 @@ def upload_image():
 """
     Application wide 404 error handler
 """
-@appbuilder.app.errorhandler(404)
+@app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
+    return render_template('404.html'), 404
 
