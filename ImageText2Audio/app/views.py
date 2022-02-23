@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, session
 from app import app
 import os
 from werkzeug.utils import secure_filename
@@ -17,9 +17,13 @@ def allowed_image(filename):
         return True
     else:
         return False
+    
+def getText(file):
+    return ["The path of the righteous man is beset on all sides","By the inequities of the selfish and the tyranny of evil men","Blessed is he who, in the name of charity and good will","Shepherds the weak through the valley of darkness"," \
+            For he is truly his brother's keeper and the finder of lost children","And I will strike down upon thee","With great vengeance and furious anger","Those who attempt to poison and destroy my brothers","And you will know my name is the Lord","When I lay my vengeance upon thee"]
 
 """
-    Define you Views here
+    Views
 """
 
 app.config["IMAGE_UPLOADS"] = "./uploads"
@@ -44,7 +48,8 @@ def upload_image():
 
             if allowed_image(image.filename):
                 filename = secure_filename(image.filename)
-
+                
+                session['ImageName'] = os.path.join(app.config["IMAGE_UPLOADS"], filename)
                 image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
 
                 print("Image saved")
@@ -57,9 +62,9 @@ def upload_image():
 
     return render_template("upload_image.html")
 
-@app.route("/result", methods=["GET"])
+@app.route("/result")
 def result():
-    return render_template("result.html")
+    return render_template("result.html", text=getText(session['ImageName']))
     
 
 """
