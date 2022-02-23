@@ -29,38 +29,28 @@ def getText(file):
 app.config["IMAGE_UPLOADS"] = "./uploads"
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
-
-@app.route("/upload-image", methods=["GET", "POST"])
-def upload_image():
-
-    if request.method == "POST":
-
-        if request.files:
-
-            image = request.files["image"]
-
-            if image.filename == "":
-                print("No filename")
-                return redirect(request.url)
-
-            if allowed_image(image.filename):
-                filename = secure_filename(image.filename)
-                
-                session['ImageName'] = os.path.join(app.config["IMAGE_UPLOADS"], filename)
-                image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
-
-                print("Image saved")
-
-                return redirect("/result")
-
-            else:
-                print("That file extension is not allowed")
-                return redirect(request.url)
-
     return render_template("upload_image.html")
+
+@app.route("/upload-image", methods=["POST"])
+def upload_image():
+    if request.files:
+        image = request.files["image"]
+
+        if image.filename == "":
+            return redirect(request.url)
+
+        if allowed_image(image.filename):
+            filename = secure_filename(image.filename)
+            session['ImageName'] = os.path.join(app.config["IMAGE_UPLOADS"], filename)
+            image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
+            return redirect("/result")
+
+        else:
+            return redirect(request.url)
+
+    return redirect("/")
 
 @app.route("/result")
 def result():
