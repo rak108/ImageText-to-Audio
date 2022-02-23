@@ -49,13 +49,18 @@ def upload_image():
 
                 print("Image saved")
 
-                return redirect(request.url)
+                return redirect("/result")
 
             else:
                 print("That file extension is not allowed")
                 return redirect(request.url)
 
     return render_template("upload_image.html")
+
+@app.route("/result", methods=["GET"])
+def result():
+    return render_template("result.html")
+    
 
 """
     Application wide 404 error handler
