@@ -2,6 +2,8 @@ from flask import render_template, request, redirect, session
 from app import app
 import os
 from werkzeug.utils import secure_filename
+import pytesseract
+from PIL import Image
 
 def allowed_image(filename):
 
@@ -19,8 +21,7 @@ def allowed_image(filename):
         return False
     
 def getText(file):
-    return ["The path of the righteous man is beset on all sides","By the inequities of the selfish and the tyranny of evil men","Blessed is he who, in the name of charity and good will","Shepherds the weak through the valley of darkness"," \
-            For he is truly his brother's keeper and the finder of lost children","And I will strike down upon thee","With great vengeance and furious anger","Those who attempt to poison and destroy my brothers","And you will know my name is the Lord","When I lay my vengeance upon thee"]
+    return list(pytesseract.image_to_string( Image.open(file)).split('\n'))
 
 """
     Views
@@ -64,7 +65,9 @@ def upload_image():
 
 @app.route("/result")
 def result():
-    return render_template("result.html", text=getText(session['ImageName']))
+    if os.path.isfile(session['ImageName']):
+        return render_template("result.html", text=getText(session['ImageName']))
+    return redirect('/upload-image')
     
 
 """
