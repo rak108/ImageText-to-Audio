@@ -6,6 +6,8 @@ import pytesseract
 from PIL import Image
 import cv2
 import numpy as np
+# import nltk
+
 
 def allowed_image(filename):
 
@@ -68,27 +70,31 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
     return (auto_result, alpha, beta)
 
 
+# words = set(nltk.corpus.words.words())
 
 def getText(file):
-    img = Image.open(file)
-    # auto_result, alpha, beta = automatic_brightness_and_contrast(img)
-    # print('alpha', alpha)
-    # print('beta', beta)
+    img = cv2.imread(file)
+    auto_result, alpha, beta = automatic_brightness_and_contrast(img)
+    print('alpha', alpha)
+    print('beta', beta)
     # cv2_imshow(auto_result)
-    # img = auto_result
-    # filtered = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 41)
-    # kernel = np.ones((1, 1), np.uint8)
-    # opening = cv2.morphologyEx(filtered, cv2.MORPH_OPEN, kernel)
-    # closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
-    # img = cv2.bitwise_or(img, closing)
-    return list(pytesseract.image_to_string(img).split('\n'))
+    img = auto_result
+    filtered = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 41)
+    kernel = np.ones((1, 1), np.uint8)
+    opening = cv2.morphologyEx(filtered, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+    img = cv2.bitwise_or(img, closing)
+    text = pytesseract.image_to_string(img)
+    # return list(" ".join(w for w in nltk.wordpunct_tokenize(text) \
+    #      if w.lower() in words or not w.isalpha()).split('\n'))
+    return list(text.split('\n'))
 
 """
     Views
 """
 
 app.config["IMAGE_UPLOADS"] = "./uploads"
-app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG", "HEIC"]
+app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
 @app.route("/", methods=["GET"])
 def index():
