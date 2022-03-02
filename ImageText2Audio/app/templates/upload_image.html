@@ -4,29 +4,30 @@
 
 {% block main %}
 
-<div class="container">
-  <div class="row">
-    <div class="col">
-
-      <h1>Upload an image</h1>
-      <hr>
-
-      <form action="/upload-image" method="POST" enctype="multipart/form-data">
-
-        <div class="form-group">
-          <label>Select image</label>
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" name="image" id="image">
-            <label class="custom-file-label" for="image">Select image...</label>
+<main>
+  <div class="b-example-divider"></div>
+  <div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto mb-4" src="https://929687.smushcdn.com/2633864/wp-content/uploads/2020/05/tesseract_text_localization_tesseract_logo.png?lossy=1&strip=1&webp=1" alt="Tesseract OCR" height="93">
+    <h1 class="display-5 fw-bold">Upload an Image</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">
+        <form action="/upload-image" method="POST" enctype="multipart/form-data">
+          <div class="row lead mb-4">
+            <div class="col-md-4">
+              <label class="custom-file-label" for="image">Select Image</label>
+            </div>
+            <div class="col-md-8">
+              <input type="file" class="form-control" name="image" id="image">
+            </div>
           </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Upload</button>
-
-      </form>
-
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <button type="submit" class="btn btn-primary btn-lg px-4 gap-3">Upload</button>
+          </div>
+        </form>
+      </p>
     </div>
   </div>
-</div>
+  <div class="b-example-divider"></div>
+</main>
 
 {% endblock %}
