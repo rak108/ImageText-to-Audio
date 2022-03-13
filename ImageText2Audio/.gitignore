@@ -8,3 +8,6 @@ env
 venv
 *.sublime*
 ./app/uploads
+.env
+./audio/
+./audio/*

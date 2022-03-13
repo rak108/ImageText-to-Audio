@@ -6,6 +6,10 @@ import pytesseract
 from PIL import Image
 import cv2
 import numpy as np
+import time
+import azure.cognitiveservices.speech as speechsdk
+from flask import send_from_directory
+
 # import nltk
 
 
@@ -72,6 +76,19 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
 
 # words = set(nltk.corpus.words.words())
 
+def convertToAudio(text):
+    speech_config = speechsdk.SpeechConfig(subscription=os.environ.get("SPEECH_KEY"), region=os.environ.get("REGION_LOCATION"))
+    speech_config.speech_synthesis_language = "en-US"
+    speech_config.speech_synthesis_voice_name ="en-US-ChristopherNeural"
+    outputFilePath = f'./audio/text_{int(time.time())}.wav'
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=outputFilePath)
+    synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+    synthesizer.speak_text(text)
+
+    time.sleep(2)
+
+    return outputFilePath
+
 def getText(file):
     img = cv2.imread(file)
     auto_result, alpha, beta = automatic_brightness_and_contrast(img)
@@ -122,9 +139,13 @@ def upload_image():
 @app.route("/result")
 def result():
     if os.path.isfile(session['ImageName']):
-        return render_template("result.html", text=getText(session['ImageName']))
+        textList = getText(session['ImageName'])
+        return render_template("result.html", text=textList, audioFilePath=convertToAudio("\n".join(textList)))
     return redirect('/upload-image')
     
+@app.route('/audio/<path:filename>')
+def download_file(filename):
+    return send_from_directory(f'/home/gaurang/projects/ImageText-to-Audio/ImageText2Audio/audio', filename)
 
 """
     Application wide 404 error handler
