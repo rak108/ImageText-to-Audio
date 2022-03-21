@@ -120,27 +120,33 @@ def index():
 @app.route("/upload-image", methods=["POST"])
 def upload_image():
     if request.files:
-        image = request.files["image"]
+        images = request.files.getlist("image")
+        for image in images:
+            if image.filename == "":
+                return redirect(request.url)
 
-        if image.filename == "":
-            return redirect(request.url)
+            if allowed_image(image.filename):
+                filename = secure_filename(image.filename)
+                ImageName = os.path.join(app.config["IMAGE_UPLOADS"], filename)
+                session['ImageFiles'].append(ImageName)
+                image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
 
-        if allowed_image(image.filename):
-            filename = secure_filename(image.filename)
-            session['ImageName'] = os.path.join(app.config["IMAGE_UPLOADS"], filename)
-            image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
-            return redirect("/result")
-
-        else:
-            return redirect(request.url)
+            else:
+                return redirect(request.url)
+        
+        return redirect("/result")
 
     return redirect("/")
 
 @app.route("/result")
 def result():
-    if os.path.isfile(session['ImageName']):
-        textList = getText(session['ImageName'])
-        return render_template("result.html", text=textList, audioFilePath=convertToAudio("\n".join(textList)))
+    textCombined = ""
+    for ImageName in session['ImageFiles']:
+        if os.path.isfile(ImageName):
+            textList = getText(ImageName)
+            textCombined += textList
+    if textCombined:
+        return render_template("result.html", text=textCombined, audioFilePath=convertToAudio("\n".join(textCombined)))
     return redirect('/upload-image')
     
 @app.route('/audio/<path:filename>')
